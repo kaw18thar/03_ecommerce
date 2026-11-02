@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const cartTotalMessage = document.getElementById("cart-total");
   const totalPriceDisplay = document.getElementById("total-price");
   const checkoutButton = document.getElementById("checkout-btn");
-  const cart = JSON.parse(localStorage.getItem("cart")) || [];
+  let cart = JSON.parse(localStorage.getItem("cart")) || [];
   renderCart();
   products.forEach((product) => {
     const productDiv = document.createElement("div");
@@ -55,15 +55,9 @@ document.addEventListener("DOMContentLoaded", () => {
         <button data-id="${item.id}">Remove</button>`;
         cartItems.appendChild(cartItem);
         const removeButton = cartItem.querySelector("button");
-        removeButton.addEventListener("click", () => {
-          const index = cart.findIndex((p) => p.id === item.id);
-          if (index !== -1) {
-            totalPriceDisplay.textContent =
-              totalPrice.toFixed(2) - item.price.toFixed(2);
-            cart.splice(index, 1);
-            localStorage.setItem("cart", JSON.stringify(cart));
-            renderCart();
-          }
+        removeButton.addEventListener("click", (e) => {
+          e.stopPropagation();
+          removeItemFromCart(item);
         });
         totalPriceDisplay.textContent = totalPrice.toFixed(2);
       });
@@ -71,6 +65,12 @@ document.addEventListener("DOMContentLoaded", () => {
       emptyCartMessage.classList.remove("hidden");
       totalPriceDisplay.textContent = "0.00";
     }
+  }
+  function removeItemFromCart(item) {
+    console.log("Removing item from cart:", item);
+    cart = cart.filter((p) => p.id !== item.id);
+    localStorage.setItem("cart", JSON.stringify(cart));
+    renderCart();
   }
   checkoutButton.addEventListener("click", () => {
     cart.length = 0; // Clear the cart
